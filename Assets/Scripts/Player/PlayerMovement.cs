@@ -1,116 +1,88 @@
 using UnityEngine;
-
+using System.Collections;
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed;
+    [SerializeField]
+    private CharacterController characterController;
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField][Range(0, 1)] float moveSmoothTime = 0.3f;
 
-    public float groundDrag;
+    Vector2 currentDir = Vector2.zero;
+    Vector2 currentDirVelocity = Vector2.zero;
+    [SerializeField] private Transform orientation;
 
-    public float jumpForce;
-    public float jumpCooldown;
-    public float airMultiplier;
-    bool readyToJump;
 
-    [HideInInspector] public float walkSpeed;
-    [HideInInspector] public float sprintSpeed;
 
-    [Header("Keybinds")]
-    public KeyCode jumpKey = KeyCode.Space;
+    [Header("Gravity")]
+    [SerializeField] private float GravityForce = 9.8f;
+    private float velocityY;
 
-    [Header("Ground Check")]
-    public float playerHeight;
-    public LayerMask whatIsGround;
-    bool grounded;
+    [Header("Jumping")]
+    private bool isJumping;
+    [SerializeField] private KeyCode jumpKey = KeyCode.Space;
+    [SerializeField] private float jumpForce = 10f;
+    private Vector3 playerVelocity;
+    private bool canJump;
+    private bool groundedPlayer;
 
-    public Transform orientation;
 
-    float horizontalInput;
-    float verticalInput;
 
-    Vector3 moveDirection;
-
-    Rigidbody rb;
 
     private void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        rb.freezeRotation = true;
+        characterController = GetComponent<CharacterController>();
 
-        readyToJump = true;
     }
 
     private void Update()
     {
-        // ground check
-        grounded = Physics.Raycast(transform.position, Vector3.down, playerHeight * 0.5f + 0.3f, whatIsGround);
-
-        MyInput();
-        SpeedControl();
-
-        // handle drag
-        // if (grounded)
-        //     rb.drag = groundDrag;
-        // else
-        //     rb.drag = rb.drag / 2f;
-    }
-
-    private void FixedUpdate()
-    {
         MovePlayer();
-    }
 
-    private void MyInput()
-    {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
-
-        // when to jump
-        if(Input.GetKey(jumpKey) && readyToJump && grounded)
-        {
-            readyToJump = false;
-
-            Jump();
-
-            Invoke(nameof(ResetJump), jumpCooldown);
-        }
     }
 
     private void MovePlayer()
     {
-        // calculate movement direction
-        moveDirection = orientation.forward * verticalInput + orientation.right * horizontalInput;
 
-        // on ground
-        if(grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f, ForceMode.Force);
+        groundedPlayer = characterController.isGrounded;
+        
+        if(!groundedPlayer){
 
-        // in air
-        else if(!grounded)
-            rb.AddForce(moveDirection.normalized * moveSpeed * 10f * airMultiplier, ForceMode.Force);
-    }
+            characterController.slopeLimit = 90;
 
-    private void SpeedControl()
-    {
-        Vector3 flatVel = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
-
-        // limit velocity if needed
-        if(flatVel.magnitude > moveSpeed)
-        {
-            Vector3 limitedVel = flatVel.normalized * moveSpeed;
-            rb.velocity = new Vector3(limitedVel.x, rb.velocity.y, limitedVel.z);
         }
+
+        if (groundedPlayer && playerVelocity.y < 0)
+        {
+            characterController.slopeLimit = 50;
+            playerVelocity.y = 0f;
+        }
+
+        Vector2 target = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        target.Normalize();
+        // smoothing movement
+        currentDir = Vector2.SmoothDamp(currentDir, target, ref currentDirVelocity, moveSmoothTime);
+
+        // calculate movement direction
+        Vector3 Velocity = (orientation.forward * currentDir.y + orientation.right * currentDir.x) * moveSpeed + Vector3.down * velocityY;
+        characterController.Move(Velocity * Time.deltaTime);
+
+        // Player jump controls
+        if (Input.GetKey(jumpKey) && groundedPlayer)
+        {
+            playerVelocity.y += Mathf.Sqrt(jumpForce * -1f * GravityForce);
+        }
+
+        // adding player gravity 
+        // playerGravity();
+        playerVelocity.y += GravityForce * Time.deltaTime;
+        // jump movement
+        characterController.Move(playerVelocity * Time.deltaTime);
+
     }
 
-    private void Jump()
-    {
-        // reset y velocity
-        rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
 
-        rb.AddForce(transform.up * jumpForce, ForceMode.Impulse);
-    }
-    private void ResetJump()
-    {
-        readyToJump = true;
-    }
+
+
+
 }
