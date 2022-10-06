@@ -15,15 +15,16 @@ public class PlayerMovement : MonoBehaviour
 
 
     [Header("Gravity")]
-    [SerializeField] private float GravityForce = 9.8f;
+    [SerializeField]
+    private float GravityForce = -20f;
     private float velocityY;
 
     [Header("Jumping")]
-    private bool isJumping;
+
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private float jumpForce = 10f;
     private Vector3 playerVelocity;
-    private bool canJump;
+
     private bool groundedPlayer;
 
 
@@ -45,7 +46,7 @@ public class PlayerMovement : MonoBehaviour
     {
 
         groundedPlayer = characterController.isGrounded;
-        
+
         if(!groundedPlayer){
 
             characterController.slopeLimit = 90;
@@ -67,10 +68,15 @@ public class PlayerMovement : MonoBehaviour
         Vector3 Velocity = (orientation.forward * currentDir.y + orientation.right * currentDir.x) * moveSpeed + Vector3.down * velocityY;
         characterController.Move(Velocity * Time.deltaTime);
 
-        // Player jump controls
+        jump(jumpForce);
+
+    }
+
+    // Player jump controls
+    void jump(float PlayerJumpForce){
         if (Input.GetKey(jumpKey) && groundedPlayer)
         {
-            playerVelocity.y += Mathf.Sqrt(jumpForce * -1f * GravityForce);
+            playerVelocity.y += Mathf.Sqrt(PlayerJumpForce * -1f * GravityForce);
         }
 
         // adding player gravity 
@@ -78,6 +84,8 @@ public class PlayerMovement : MonoBehaviour
         playerVelocity.y += GravityForce * Time.deltaTime;
         // jump movement
         characterController.Move(playerVelocity * Time.deltaTime);
+
+
 
     }
 

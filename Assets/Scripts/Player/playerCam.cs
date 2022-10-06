@@ -9,8 +9,6 @@ public class playerCam : MonoBehaviour
     [SerializeField]
     private float senY;
 
-    [SerializeField]
-    private Transform orientation;
     private float yRotation;
     private float xRotation;
     [Header("smoothing")]
@@ -34,7 +32,7 @@ public class playerCam : MonoBehaviour
         yRotation += currentDelta.x;
         xRotation -= currentDelta.y;
 
-        xRotation = Mathf.Clamp(xRotation ,-90f,90f);
+        xRotation = Mathf.Clamp(xRotation ,-90f,85f);
         // moving in x or y i don't know axis (moving player body)
         playerBody.transform.rotation = Quaternion.Euler(0f,yRotation,0f);
         // moving in x or y i don't know axis (moving camera)
