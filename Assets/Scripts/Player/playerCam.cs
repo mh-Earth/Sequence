@@ -17,10 +17,13 @@ public class playerCam : MonoBehaviour
     private Vector2 currentDelta;
     private Vector2 currentDeltaVelocity;
 
+    public static float playerUpClamping = -90f;
+    public static float playerDownClamping = 85f;
+
     private void Start() {
         
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = true;
+        Cursor.visible = false;
 
     }
 
@@ -32,7 +35,7 @@ public class playerCam : MonoBehaviour
         yRotation += currentDelta.x;
         xRotation -= currentDelta.y;
 
-        xRotation = Mathf.Clamp(xRotation ,-90f,85f);
+        xRotation = Mathf.Clamp(xRotation ,playerUpClamping,playerDownClamping);
         // moving in x or y i don't know axis (moving player body)
         playerBody.transform.rotation = Quaternion.Euler(0f,yRotation,0f);
         // moving in x or y i don't know axis (moving camera)
