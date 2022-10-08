@@ -17,7 +17,7 @@ public class GunHolder : MonoBehaviour
 
     private void Update() {
         
-        gunFacing();
+        // gunFacing();
 
     }
 

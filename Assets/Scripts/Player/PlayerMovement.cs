@@ -68,15 +68,10 @@ public class PlayerMovement : MonoBehaviour
         Vector3 Velocity = (orientation.forward * currentDir.y + orientation.right * currentDir.x) * moveSpeed + Vector3.down * velocityY;
         characterController.Move(Velocity * Time.deltaTime);
 
-        jump(jumpForce);
-
-    }
-
-    // Player jump controls
-    void jump(float PlayerJumpForce){
+        // Player jump controls
         if (Input.GetKey(jumpKey) && groundedPlayer)
         {
-            playerVelocity.y += Mathf.Sqrt(PlayerJumpForce * -1f * GravityForce);
+            playerVelocity.y += Mathf.Sqrt(jumpForce * -1f * GravityForce);
         }
 
         // adding player gravity 
@@ -86,11 +81,7 @@ public class PlayerMovement : MonoBehaviour
         characterController.Move(playerVelocity * Time.deltaTime);
 
 
-
     }
-
-
-
 
 
 }

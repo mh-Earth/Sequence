@@ -36,10 +36,10 @@ public class playerCam : MonoBehaviour
         xRotation -= currentDelta.y;
 
         xRotation = Mathf.Clamp(xRotation ,playerUpClamping,playerDownClamping);
-        // moving in x or y i don't know axis (moving player body)
+        // moving in x  axis or i don't know axis (moving player body)
         playerBody.transform.rotation = Quaternion.Euler(0f,yRotation,0f);
-        // moving in x or y i don't know axis (moving camera)
-        transform.rotation = Quaternion.Euler(xRotation,yRotation,0f);
+        // moving in y axis or i don't know axis (moving player body instead of camera)[for fixing a asshole bug]
+        playerBody.transform.rotation = Quaternion.Euler(xRotation,yRotation,0f);
         // orientation.rotation = Quaternion.Euler(0f,yRotation,0);
 
     }

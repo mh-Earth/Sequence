@@ -13,9 +13,9 @@ public class Gun : MonoBehaviour
     [SerializeField]
     private GameObject fireParticle;
     [SerializeField]
+    private ParticleSystem bulletFireParticle;
+    [SerializeField]
     private float fireRate =15f;
-    [SerializeField][Range(0.001f,0.005f)]
-    private float GunBackForce = 0.002f;
 
     [SerializeField]
     private float bulletImpactForce = 5f;
@@ -64,8 +64,9 @@ public class Gun : MonoBehaviour
                 {   
                     
                     // Fire hit surface particle effects
+                    bulletFireParticle.Play();
                     GameObject a = Instantiate(fireParticle, ray.point, Quaternion.LookRotation(ray.normal));
-                    Destroy(a, 2f);
+                    Destroy(a, 1f);
                     // Add force to the hit obj
                     if(ray.rigidbody != null){
                         ray.rigidbody.AddForce(-ray.normal*bulletImpactForce,ForceMode.Impulse);
